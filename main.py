@@ -1,5 +1,76 @@
 # CREATE, INSERT, DELETE, SELECT, UPDATE, COUNT, JOIN
 
+# 58 times '#'
+
+def print_table(table, table_name):
+    print("Table: " + table_name)
+    columns = table["columns"]
+    rows = table["rows"]
+    
+    joined_columns = []
+
+    for i in range(len(columns)):
+        new_list = []
+        new_list.append(columns[i])
+        for row in rows:
+            new_list.append(row[i])
+        
+        joined_columns.append(new_list)
+
+
+
+    column_lengths = []
+    for i in joined_columns:
+        longest = len(max(i, key=len))
+        column_lengths.append(longest)
+
+    print("+", end='')
+    for length in column_lengths:
+        print("-"*(length+2)+"+",end='')
+    print('')
+
+    print("| ",end='')
+    for i in range(len(columns)):
+        gap = column_lengths[i] - len(columns[i])
+        print(columns[i] + " "*gap + " | ",end='')
+    print('')
+
+
+    print("+", end='')
+    for length in column_lengths:
+        print("-"*(length+2)+"+",end='')
+    print('')
+
+    for i in range(len(rows)):
+        print("|",end='')
+        index = 0
+        for j in range(len(rows[i])):
+            gap = column_lengths[index] - len(rows[i][j])
+            print(" "+rows[i][j] + " "*gap + " |",end='')
+            index += 1
+        print('')
+
+    
+    # index = 0
+    # for i in range(len(joined_columns)):
+    #     print("| ", end='')
+    #     for j in range(len(joined_columns[i])):
+    #         gap = column_lengths[index] - len(joined_columns[i][j])
+    #         print(joined_columns[i][j] + " "*gap + " | ",end='')
+    #         index = (index + 1) % len(column_lengths)
+    #         print("{:{align}}| ".format(joined_columns[j][i], align=gap), end='')
+            
+    #     print('')
+
+    print('+',end='')
+    for length in column_lengths:
+        print("-"*(length+2)+"+",end='')
+    
+    print('')
+
+def printasd(asd):
+    print(asd)
+
 class main:
     def __init__(self):
         self.tables = {}
@@ -18,7 +89,9 @@ class main:
             # columns holds a list of strings
             # rows hold a nested list.
         self.tables[table_name] = {"columns": columns, "rows": []}
-        print("Table created successfully")
+        print('#'*22+" CREATE "+'#'*25)
+        print("Table '"+ table_name +"' created with columns: "+ str(columns))
+        print('#'*55)
         
     def insert(self, table_name, values):
         if table_name not in self.tables:
@@ -35,7 +108,25 @@ class main:
         
         # Insert the values
         table["rows"].append(values)
-        print("Row inserted successfully")
+        print('#'*22+" INSERT "+'#'*25)
+        tmp_text = ""
+        tmp_text += "("
+        for i in range(len(values)):
+            if i != 0:
+                tmp_text += " "
+            tmp_text += "'"
+            tmp_text += str(values[i])
+            tmp_text += "'"
+            if i < len(values)-1:
+                tmp_text += ","
+        tmp_text += ")"
+        print("Inserted into '"+ table_name +"': " + tmp_text)
+        print("")
+
+
+        print_table(table,table_name)
+
+        print('#'*55)
 
     def select(self, table_name, _columns, conditions):
         if table_name not in self.tables:
@@ -150,17 +241,17 @@ class main:
             print("Rows deleted successfully")
     
     # JOIN <table1>,<table2> ON <column>
-    def join(self, table1, table2, _column):
-        if table1 not in self.tables or table2 not in self.tables:
+    def join(self, table1_name, table2_name, _column):
+        if table1_name not in self.tables or table2_name not in self.tables:
             print("Specified Table(s) does not exist")
             return
 
         # Find the tables, columns and rows    
-        table1 = self.tables[table1]
+        table1 = self.tables[table1_name]
         column1 = table1["columns"]
         rows1 = table1["rows"]
 
-        table2 = self.tables[table2]
+        table2 = self.tables[table2_name]
         column2 = table2["columns"]
         rows2 = table2["rows"]
 
@@ -184,8 +275,10 @@ class main:
                 if row1[column1_index] == row2[column2_index]:
                     self.insert("joined_table", row1 + row2)
         
-        print("Tables joined successfully")
-
+        print("Join tables "+table1_name+" and "+table2_name)
+        print("Join result (" +str(len(self.tables["joined_table"]["rows"])) +" rows):")
+        print("")
+        print_table(self.tables["joined_table"], "Joined Table")
     def count(self, table_name, conditions):
         if table_name not in self.tables:
             print("Specified Table does not exist")
@@ -251,9 +344,7 @@ m.insert("courses", ["103","Data Structures","CS"])
 # m.delete("courses", {"major": "PE", "course_id":"103"})
 # m.count("courses", {"major": "CS"})
 
-# m.join("students", "courses", "major")
-
-print(m.tables["courses"])
+m.join("students", "courses", "major")
 
 
 
@@ -261,7 +352,6 @@ print(m.tables["courses"])
 
 
 
-print("#"*100)
 
 input_text = ""
 with open("i1.txt", "r", encoding="utf-8") as input_file:
@@ -275,49 +365,7 @@ for i in cleaned_lines:
     cleaned_tokens.append(i.split())
 
 
-def print_table(table, table_name):
-    print("Table: " + table_name)
-    columns = table["columns"]
-    rows = table["rows"]
-    
-    joined_columns = []
-
-    for i in range(len(columns)):
-        new_list = []
-        new_list.append(columns[i])
-        for row in rows:
-            new_list.append(row[i])
-        
-        joined_columns.append(new_list)
 
 
 
-    column_lengths = []
-    for i in joined_columns:
-        longest = len(max(i, key=len))
-        column_lengths.append(longest)
-
-    print("+", end='')
-    for length in column_lengths:
-        print("-"*(length+2)+"+",end='')
-    print('')
-    
-    for i in range(len(joined_columns)):
-        print("| ", end='')
-        for j in range(len(joined_columns)):
-            gap = column_lengths[j] - len(joined_columns[j][i])
-            print(joined_columns[j][i] + " "*gap + " | ",end='')
-            # print("{:{align}}| ".format(joined_columns[j][i], align=gap), end='')
-            
-
-
-        print('')
-
-    print('+',end='')
-    for length in column_lengths:
-        print("-"*(length+2)+"+",end='')
-    
-    print('')
-
-
-print_table = print_table(m.tables["courses"],"courses")
+# print_table = print_table(m.tables["courses"],"courses")
