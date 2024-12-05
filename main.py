@@ -186,6 +186,38 @@ class main:
         
         print("Tables joined successfully")
 
+    def count(self, table_name, conditions):
+        if table_name not in self.tables:
+            print("Specified Table does not exist")
+            return
+        
+        table = self.tables[table_name]
+        columns = table["columns"]
+        rows = table["rows"]
+
+        rows_to_count = []
+        condition_indexes = []
+
+        for i in conditions:
+            index = -1
+            for column in columns:
+                index += 1
+                if column == i:
+                    condition_indexes.append(index)
+                    index = -1
+                    break
+
+        for row in rows:
+            can_select = True
+            for i, key in enumerate(conditions):
+                if row[condition_indexes[i]] != conditions[key]:
+                    can_select = False
+                    break
+            if can_select:
+                rows_to_count.append(row)
+        
+        print("Count: ", len(rows_to_count))
+
 sample_cmd = 'SELECT students id,name WHERE {"major": "CS"}'
 
 parts = sample_cmd.strip().split(" ", 2)
@@ -217,6 +249,7 @@ m.insert("courses", ["103","Data Structures","CS"])
 # m.select("courses", ["course_id"], {"major": "CS", "course_id":"101"})
 # m.update("courses", {"course_id": "51", "major": "IE"}, {"major": "CS"})
 # m.delete("courses", {"major": "PE", "course_id":"103"})
+# m.count("courses", {"major": "CS"})
 
 # m.join("students", "courses", "major")
 
