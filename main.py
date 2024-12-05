@@ -60,7 +60,7 @@ class main:
 
         for row in rows:
             can_select = True
-            for i, key in enumerate(conditions):  # Iterate over the keys of the dictionary
+            for i, key in enumerate(conditions):  # Iterate over the keys
                 # Compare the value at the index in the row with the condition value
                 if row[condition_indexes[i]] != conditions[key]:
                     can_select = False
@@ -261,7 +261,7 @@ print(m.tables["courses"])
 
 
 
-print("-"*100)
+print("#"*100)
 
 input_text = ""
 with open("i1.txt", "r", encoding="utf-8") as input_file:
@@ -273,3 +273,51 @@ cleaned_tokens = []
 
 for i in cleaned_lines:
     cleaned_tokens.append(i.split())
+
+
+def print_table(table, table_name):
+    print("Table: " + table_name)
+    columns = table["columns"]
+    rows = table["rows"]
+    
+    joined_columns = []
+
+    for i in range(len(columns)):
+        new_list = []
+        new_list.append(columns[i])
+        for row in rows:
+            new_list.append(row[i])
+        
+        joined_columns.append(new_list)
+
+
+
+    column_lengths = []
+    for i in joined_columns:
+        longest = len(max(i, key=len))
+        column_lengths.append(longest)
+
+    print("+", end='')
+    for length in column_lengths:
+        print("-"*(length+2)+"+",end='')
+    print('')
+    
+    for i in range(len(joined_columns)):
+        print("| ", end='')
+        for j in range(len(joined_columns)):
+            gap = column_lengths[j] - len(joined_columns[j][i])
+            print(joined_columns[j][i] + " "*gap + " | ",end='')
+            # print("{:{align}}| ".format(joined_columns[j][i], align=gap), end='')
+            
+
+
+        print('')
+
+    print('+',end='')
+    for length in column_lengths:
+        print("-"*(length+2)+"+",end='')
+    
+    print('')
+
+
+print_table = print_table(m.tables["courses"],"courses")
