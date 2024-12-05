@@ -125,11 +125,42 @@ class main:
                     rows.remove(row)
             print("Rows deleted successfully")
     
+    # JOIN <table1>,<table2> ON <column>
     def join(self, table1, table2, _column):
         if table1 not in self.tables or table2 not in self.tables:
-            print("Specified Table does not exist")
+            print("Specified Table(s) does not exist")
             return
+
+        # Find the tables, columns and rows    
+        table1 = self.tables[table1]
+        column1 = table1["columns"]
+        rows1 = table1["rows"]
+
+        table2 = self.tables[table2]
+        column2 = table2["columns"]
+        rows2 = table2["rows"]
+
+        # Find the indexes of the columns
+        column1_index = -1
+        for col1 in column1:
+            column1_index += 1
+            if col1 == _column:
+                break
         
+        column2_index = -1
+        for col2 in column2:
+            column2_index += 1
+            if col2 == _column:
+                break
+
+        # Create new table and insert the joined rows
+        self.create_table("joined_table", column1 + column2)
+        for row1 in rows1:
+            for row2 in rows2:
+                if row1[column1_index] == row2[column2_index]:
+                    self.insert("joined_table", row1 + row2)
+        
+        print("Tables joined successfully")
 
 sample_cmd = 'SELECT students id,name WHERE {"major": "CS"}'
 
@@ -149,19 +180,23 @@ print("conditions: ", conditions)
 
 
 m = main()
-# m.create_table("students", ["id", "name", "age"])
-# m.insert("students", ["1","a","17"])
+m.create_table("students", ["id", "name", "age", "major"])
+m.insert("students", ["1","John Doe","20","CS"])
+m.insert("students", ["2","Jane Smith","22","EE"])
+m.insert("students", ["3","Bob Wilson","21","CS"])
 
 m.create_table("courses", ["course_id","name","major"])
 m.insert("courses", ["101","Intro to Programming","CS"])
 m.insert("courses", ["102","Circuit Design","EE"])
-m.insert("courses", ["103","Fundamentals of Physics","PE"])
+m.insert("courses", ["103","Data Structures","CS"])
 
-m.select("courses", ["course_id"], {"major": "EE", "course_id":"101"})
-m.update("courses", {"course_id": "51", "major": "IE"}, {"major": "CS"})
-m.delete("courses", {"major": "PE", "course_id":"103"})
+# m.select("courses", ["course_id"], {"major": "EE", "course_id":"101"})
+# m.update("courses", {"course_id": "51", "major": "IE"}, {"major": "CS"})
+# m.delete("courses", {"major": "PE", "course_id":"103"})
 
-print(m.tables)
+m.join("students", "courses", "major")
+
+print(m.tables["joined_table"])
 
 
 
