@@ -46,17 +46,30 @@ class main:
         columns = table["columns"]
         rows = table["rows"]
 
+        rows_to_select = []
+        condition_indexes = []
+
         for i in conditions:
-            # Find the index of the column
             index = -1
             for column in columns:
                 index += 1
                 if column == i:
+                    condition_indexes.append(index)
+                    index = -1
                     break
-            
-            for row in rows:
-                if str(row[index]) == str(conditions[i]):
-                    print("Selected: ", row)
+
+        for row in rows:
+            can_select = True
+            for i, key in enumerate(conditions):  # Iterate over the keys of the dictionary
+                # Compare the value at the index in the row with the condition value
+                if row[condition_indexes[i]] != conditions[key]:
+                    can_select = False
+                    break
+            if can_select:
+                rows_to_select.append(row)
+
+        for row in rows_to_select:
+            print("Selected: ", row)
 
     def update(self, table_name, updates, conditions):
         if table_name not in self.tables:
@@ -67,26 +80,37 @@ class main:
         columns = table["columns"]
         rows = table["rows"]
 
+        rows_to_update = []
+        condition_indexes = []
+        
         for i in conditions:
-            # Find the index of the column
             index = -1
             for column in columns:
                 index += 1
                 if column == i:
+                    condition_indexes.append(index)
+                    index = -1
                     break
 
-            
-            for row in rows:
-                if row[index] == conditions[i]:
-                    # Update the row
-                    for update in updates:
-                        index = -1
-                        for column in columns:
-                            index += 1
-                            if column == update:
-                                break
-                        row[index] = updates[update]
-    
+        for row in rows:
+            can_update = True
+            for i, key in enumerate(conditions):  # Iterate over the keys of the dictionary
+                # Compare the value at the index in the row with the condition value
+                if row[condition_indexes[i]] != conditions[key]:
+                    can_update = False
+                    break
+            if can_update:
+                rows_to_update.append(row)
+
+        for row in rows_to_update:
+            for i in updates:
+                index = -1
+                for column in columns:
+                    index += 1
+                    if column == i:
+                        break
+                row[index] = updates[i]
+
     def delete(self, table_name, conditions):
         if table_name not in self.tables:
             print("Specified Table does not exist")
@@ -190,13 +214,13 @@ m.insert("courses", ["101","Intro to Programming","CS"])
 m.insert("courses", ["102","Circuit Design","EE"])
 m.insert("courses", ["103","Data Structures","CS"])
 
-# m.select("courses", ["course_id"], {"major": "EE", "course_id":"101"})
+# m.select("courses", ["course_id"], {"major": "CS", "course_id":"101"})
 # m.update("courses", {"course_id": "51", "major": "IE"}, {"major": "CS"})
 # m.delete("courses", {"major": "PE", "course_id":"103"})
 
-m.join("students", "courses", "major")
+# m.join("students", "courses", "major")
 
-print(m.tables["joined_table"])
+print(m.tables["courses"])
 
 
 
